@@ -27,9 +27,9 @@ config = {
     "names_path": "obj.names",
     "db_config": {
         "host": "localhost",
-        "user": "usuario",
-        "password": "contraseña",
-        "database": "nombre_base_de_datos"
+        "user": "root",
+        "password": "david12341",
+        "database": "seguridad"
     }
 }
 
@@ -48,7 +48,7 @@ def load_class_names(names_path):
         class_names = [cname.strip() for cname in f.readlines()]
     return class_names
 
-
+# Funcion que nos permite verificar la existencia de una placa en la base de datos
 def verificar_placa(placa):
     # Configuraciones de la base de datos
     db_config = config["db_config"]
@@ -64,7 +64,7 @@ def verificar_placa(placa):
     cursor = connection.cursor()
 
     # Verificar si la placa existe en la base de datos
-    query = "SELECT * FROM placas WHERE placa = %s"
+    query = "SELECT * FROM placas WHERE n_placa = %s"
     cursor.execute(query, (placa,))
     result = cursor.fetchone()
 
@@ -74,7 +74,7 @@ def verificar_placa(placa):
 
     return result is not None
 
-
+# Funcion para registrar la placa en la base de datos
 def registrar_placa(placa):
     # Configuraciones de la base de datos
     db_config = config["db_config"]
@@ -90,7 +90,7 @@ def registrar_placa(placa):
     cursor = connection.cursor()
 
     # Insertar la placa en la base de datos
-    query = "INSERT INTO placas (placa) VALUES (%s)"
+    query = "INSERT INTO placas (n_placa) VALUES (%s)"
     cursor.execute(query, (placa,))
 
     # Confirmar los cambios realizados en la base de datos
@@ -168,8 +168,12 @@ def main(config):
             now = datetime.now()
 
             if not verificar_placa(valor_f):
+                print("La placa no existe en la base de datos")
                 registrar_placa(valor_f)
+                print("La placa", valor_f ," se ha registrado en la base de datos")
 
+            else:
+                print("La placa", valor_f ," ya existe en la base de datos")
             with open("LOG_Prueba.txt", "a") as file:
                 data = [valor_f + ", " + str(now.strftime("%Y-%m-%d %H:%M:%S")) + "\n"]
                 file.writelines(data)

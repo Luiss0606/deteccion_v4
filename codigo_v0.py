@@ -33,10 +33,7 @@ with open("obj.names", "r") as f:
     class_names = [cname.strip() for cname in f.readlines()]
 
 # Cargar el video
-cap = cv2.VideoCapture("videoPlacas1.mp4")#04 y 01 ok return cv2.bilateralFilter(image, 13, 75, 75)
-#cap = cv2.VideoCapture("rtmp://127.0.0.1:10000/placas_1")
-#04,01,32,34 ok return cv2.bilateralFilter(image, 5, 35, 35)
-#cap.open('rtsp://admin:Hik12345@192.168.20.96:554/Streaming/channels/02/')
+cap = cv2.VideoCapture("videoPlacas1.mp4")
 
 
 # Cargar el modelo de la red neuronal
@@ -67,15 +64,7 @@ while cv2.waitKey(1) < 1:
 
     # Deteccion de las placas
     classes, scores, boxes = model.detect(frame, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
-    # # Creacion de un blob de la imagen, para procesarla con la red neucronal
-    # blob = cv2.dnn.blobFromImage(frame, 1/255, (416,416), (0,0,0), swapRB = True , crop = False)
-
-    # # Establecer el blob como entrada de la red neuronal
-    # net.setInput(blob)
-    # # Obtener lista de las capas de salida no conectadas del modelo
-    # output_layer_names = net.getUnconnectedOutLayersNames()
-    # layeroutputs = net.forward(output_layer_names)
-    
+ 
     # Guardar el tiempo de procesamiento del frame
     tiempo_frame=time.time()
 
@@ -110,15 +99,13 @@ while cv2.waitKey(1) < 1:
         gray = get_grayscale(crop_img)
         gran = get_resize(gray)
         gran = cv2.GaussianBlur(gran,(17,17),0)
-        #gran = remove_noise(gran)
-        #gran = get_erode(gran)
 
         # Mostrar segunda ventana
         cv2.imshow("Crop", cv2.resize(gran, (533,300)))
 
         # Obtener el texto de la placa
         res = tex.readtext(gran, allowlist = '0123456789ABCDEFGHIJKLMNOPQRSTUWXYZV', rotation_info=[0, 5, 10])
-        #print('res: ', res)
+
         for n in range(len(res)):
             if res[-(n+1)][2] > 0.15:
                 text = res[-(n+1)][1]
@@ -142,7 +129,7 @@ while cv2.waitKey(1) < 1:
                     # Obtenemos el valor mas frecuente de cada caracter
                     valor_f = str(most_freq(salida_0)) + str(most_freq(salida_1)) + str(most_freq(salida_2)) + str(
                         most_freq(salida_3)) + str(most_freq(salida_4)) + str(most_freq(salida_5))
-                    #print("Valor", valor_f)
+                    
                     # Mostrar el valor de la placa en cada frame
                     cv2.putText(frame, valor_f, (box[0], box[1] + 110), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (47, 47, 155), 2)
         
@@ -156,15 +143,12 @@ while cv2.waitKey(1) < 1:
         data = [valor_f + ", " + str(now.strftime("%Y-%m-%d %H:%M:%S")) + "\n"]
         file.writelines(data)
         file.close()
-        #print("Bounding box", aux)
+
         print("Valor final", valor_f)
         f = False
 
-    #print(tiempo_frame - tiempo_bbox)
-
     # Fin del tiempo de procesamiento
     end = datetime.utcnow()
-
 
     # Colocamos la informacion de FPS en la imagen
     fps = 'FPS: %.2f ' % (1 / (end - start).total_seconds())
@@ -172,7 +156,7 @@ while cv2.waitKey(1) < 1:
 
     # Cambiar el tamaño de la ventana de salida para mostrar a (1028,720)
     cv2.imshow("output", cv2.resize(frame, (1280, 720)))
-    #cv2.imshow("output", cv2.resize(frame, (1067,600)))
+
 
 # When everything done, release the capture
 cap.release()
