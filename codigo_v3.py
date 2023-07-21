@@ -167,6 +167,12 @@ def main(config):
                             salida[i].append(text[i])
 
                         valor_f = ''.join([most_freq(s) for s in salida])
+                        ## Imprimimos el valor en las listas de salida
+                        # print("---------------")
+                        # for i in range(6):
+                            # print(salida[i])
+                        # print("---------------")
+
                         cv2.putText(frame, valor_f, (box[0], box[1] + 110), FONT, FONT_SCALE, FONT_COLOR, 2)
 
             pos = box[0]
